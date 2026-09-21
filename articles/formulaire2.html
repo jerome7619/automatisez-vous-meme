@@ -125,90 +125,58 @@
         <p style="color:var(--muted2);font-size:.9rem">Go back to <strong>forms.office.com</strong> → open your existing form → add: <strong>Your email address</strong> (Text, Required).</p>
       </div>
       <div class="step-block">
-<div class="step-num">Step 2 — Power Automate</div>
-<div class="step-title">Open your existing flow</div>
- 
-<p style="color:var(--muted2);font-size:.9rem">
-In <strong>make.powerautomate.com</strong>, locate the flow you created in Part 1 and click <strong>Edit</strong>. You will add new actions after the existing SharePoint record creation step.
-</p>
- 
-<div class="tip-box">
-<strong>💡 Best practice:</strong>
-Always update an existing flow rather than creating a new one for the same Forms submission. Using a single trigger per form helps prevent duplicate processing.
-</div>
-</div>
- 
-<div class="step-block">
-<div class="step-num">Step 3 — Power Automate</div>
-<div class="step-title">Add an email validation condition</div>
- 
-<p style="color:var(--muted2);font-size:.9rem;margin-bottom:.75rem">
-Before sending anything, verify that the value entered resembles a valid email address. Add a <strong>Condition</strong> after the SharePoint action:
-</p>
- 
+        <div class="step-num">Étape 2 — Power Automate</div>
+        <div class="step-title">Open your existing flow</div>
+        <p style="color:var(--muted2);font-size:.9rem">In <strong>make.powerautomate.com</strong>, locate the flow you created in Part 1 and click <strong>Edit</strong>. You will add new actions after the existing SharePoint record creation step.</p>
+        <div class="tip-box"><strong>💡 Best practice:</strong> Always update an existing flow rather than creating a new one for the same Forms submission. Using a single trigger per form helps prevent duplicate processing.</div>
+      </div>
 
-<div class="mockup">
-<div class="mockup-row">
-<span class="mb-label">Value</span>
-<span class="mb-val">Your email address (Forms response)</span>
-<span class="mb-tag blue">dynamic</span>
-</div>
+      <div class="step-block">
+        <div class="step-num">Étape 3 — Power Automate</div>
+        <div class="step-title">Add an email validation condition</div>
+        <p style="color:var(--muted2);font-size:.9rem;margin-bottom:.75rem">Before sending anything, verify that the value entered resembles a valid email address. Add a <strong>Condition</strong> after the SharePoint action:</p>
+        <div class="mockup">
+          <div class="mockup-row"><span class="mb-label">Value</span><span class="mb-val">Your email address (Forms response)</span><span class="mb-tag blue">dynamic</span></div>
+          <div class="mockup-row"><span class="mb-label">Operator</span><span class="mb-val">contains</span></div>
+          <div class="mockup-row"><span class="mb-label">Value</span><span class="mb-val">@</span></div>
+        </div>
+        <div class="tip-box"><strong>💡 Why check for the @ symbol?</strong> If someone enters their name instead of an email address, Power Automate would attempt to send a message to an invalid recipient. This simple validation prevents the error before it occurs.</div>
+      </div>
 
- 
-<div class="mockup-row">
-<span class="mb-label">Operator</span>
-<span class="mb-val">contains</span>
-</div>
-
- 
-<div class="mockup-row">
-<span class="mb-label">Value</span>
-<span class="mb-val">@</span>
-</div>
-</div>
-
- 
-<div class="tip-box">
-<strong>💡 Why check for the @ symbol?</strong>
-If someone enters their name instead of an email address, Power Automate would attempt to send a message to an invalid recipient. This simple validation prevents the error before it occurs.
-</div>
-</div>
- 
-<div class="step-block">
-<div class="step-num">Step 4 — Power Automate</div>
-<div class="step-title">Configure the acknowledgement email in the “If yes” branch</div>
-
- 
-<p style="color:var(--muted2);font-size:.9rem;margin-bottom:.75rem">
-In the <strong>“If yes”</strong> branch, add the <strong>“Send an email (V2)”</strong> action:
-</p>
- 
-
-<div class="mockup">
-<div class="mockup-row">
-<span class="mb-label">To</span>
-<span class="mb-val">Your email address (Forms response)</span>
-<span class="mb-tag blue">dynamic</span>
-</div>
- 
-<div class="mockup-row">
-<span class="mb-label">Subject</span>
-<span class="mb-val">✅ Your request has been successfully received — @{Request Title}</span>
-</div>
- 
-<div class="mockup-row">
-<span class="mb-label">Body</span>
-<span class="mb-val">
-Hello @{Full Name},<br><br>
+      <div class="step-block">
+        <div class="step-num">Étape 4 — Power Automate</div>
+        <div class="step-title">Configure the acknowledgement email in the “If yes” branch</div>
+        <p style="color:var(--muted2);font-size:.9rem;margin-bottom:.75rem">In the <strong>“If yes”</strong> branch, add the <strong>“Send an email (V2)”</strong> action:</p>
+        <div class="mockup">
+          <div class="mockup-row"><span class="mb-label">To</span><span class="mb-val">Your email address (Forms response)</span><span class="mb-tag blue">dynamic</span></div>
+          <div class="mockup-row"><span class="mb-label">Subject</span><span class="mb-val">✅ Your request has been successfully received — @{Request Title}</span></div>
+          <div class="mockup-row"><span class="mb-label">Body</span><span class="mb-val">Hello @{Full Name},<br><br>
 We confirm that we have successfully received your request submitted on @{Submission Date}.<br><br>
 • Request: @{Request Title}<br>
 • Department: @{Department}<br>
 • Current Status: Pending Processing<br><br>
 You will be notified as soon as a decision has been made.<br><br>
-This message was generated automatically.
-</span>
-</div>
-</div>
+This message was generated automatically.</span></div>
+        </div>
+        <div class="warn-box"><strong>⚠️ In the “If no” branch: </strong> Optional. You can send an email to your own address to notify you that a submission contained an invalid email address, allowing you to follow up manually.</div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-num">Étape 5 — Testing</div>
+        <div class="step-title">Validate both scenarios before sharing</div>
+        <table class="excel-table">
+          <thead><tr><th>Test</th><th>Email entered</th><th>Expected result</th></tr></thead>
+          <tbody>
+            <tr><td>✅ Valid</td><td>cole.caufield@formation-demo.ca</td><td>Acknowledgement email received</td></tr>
+            <tr><td>⚠️ Invalid</td><td>Cole Caufield</td><td>No email sent</td></tr>
+          </tbody>
+        </table>
+        <div class="warn-box"><strong>🧪 Time to test!</strong> Temporarily replace the dynamic email address with your own for testing purposes. Once both scenarios have been validated, restore the dynamic address and share the form. Nick Suzuki's request will never wait in limbo again.</div>
+      </div>
+
+      <h3>🎯 Final Result</h3>
+      <p>The employee submits a request → immediately receives a personalized acknowledgement email → knows that the request has been successfully recorded. No more unnecessary follow-ups.</p>
+      <p>⭐ <strong>One condition, one action, and your process becomes professional in just 30 minutes.</strong></p>
       
       <div class="nav-series" style="margin-top:2rem"><a href="formulaires.html" class="nav-btn secondary">← Part 1 — Online form</a><a href="formulaire3a.html" class="nav-btn primary">Part 3 — Approval →</a></div>
     </div>
