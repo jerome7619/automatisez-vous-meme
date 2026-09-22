@@ -117,15 +117,71 @@
     <div id="article-body-en" class="article-body lang-en" style="display:none">
       <p>Every professional trip generates a cascade of manual tasks: filling out a form, sending it to the right person, waiting for confirmation, following up if nothing comes back. Power Automate can handle all of this automatically from the moment of submission.</p>
 
-      <div class="step-block">
-        <div class="step-num">Steps 1–6</div>
-        <div class="step-title">SharePoint list → Trigger → Delay logic → Admin notification → Group duplication → Acknowledgement</div>
-        <p style="color:var(--muted2);font-size:.9rem">Follow the same 4-step pattern as the French version above: SharePoint list → trigger → notification to admin assistant → acknowledgement to requester. The key is giving the admin assistant all details in one structured email, and confirming receipt to the employee immediately.</p>
-        <div class="tip-box"><strong>💡 The DocumentsJoints column</strong> lets you link purchase orders and invoices directly to each request — employees can consult their full travel history in SharePoint at any time.</div>
+<div style="background:rgba(8,130,168,0.06);border-left:3px solid var(--cyan);padding:.875rem 1rem;border-radius:0 8px 8px 0;font-size:.88rem;color:var(--muted2);margin:1.25rem 0">
+        <strong style="color:var(--text)">⏱ Estimated build time :</strong> 30 to 45 minutes — SharePoint lists, automated flow, notification and acknowledgment of receipt.
       </div>
 
-      <h3>🎯 Final Result</h3>
-      <p>One flow, six steps — your travel request process becomes traceable, standardized, and professional from day one.</p>
+      
+
+            <div class="step-block">
+        <div class="step-num">Step 1 — SharePoint</div>
+        <div class="step-title">Create the travel request list</div>
+        <p style="color:var(--muted2);font-size:.9rem;margin-bottom:.75rem">On your SharePoint site, create a <strong>travel request list</strong> with these columns : </p>
+        <table class="excel-table">
+          <thead><tr><th>Column</th><th>Type</th><th>Required</th></tr></thead>
+          <tbody>
+            <tr><td>Requester</td><td>Text</td><td>✅ Yes</td></tr>
+            <tr><td>Destination</td><td>Text</td><td>✅ Yes</td></tr>
+            <tr><td>DepartueDate</td><td>Date and time</td><td>✅ Yes</td></tr>
+            <tr><td>ReturnDate</td><td>Date and time</td><td>✅ Yes</td></tr>
+            <tr><td>Subject</td><td>Long Text</td><td>✅ Yes</td></tr>
+            <tr><td>Status</td><td>Choice : Pending / Confirmee / Rejected</td><td>✅ Yes</td></tr>
+            <tr><td>AttachedDocuments</td><td>Hyperlink</td><td>No</td></tr>
+          </tbody>
+        </table>
+        <div class="tip-box"><strong>💡 The AttachedDocuments columns </strong> allows purchase orders and invoices to be linked directly to each request—employees can view their full history with a single click from SharePoint. </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-num">Step 2 — Power Automate</div>
+        <div class="step-title">Trigger : new entry in the SharePoint list</div>
+        <p style="color:var(--muted2);font-size:.9rem;margin-bottom:.75rem">Create an automated flow using <strong>« When an item is created »</strong> (SharePoint) :</p>
+        <div class="mockup">
+          <div class="mockup-row"><span class="mb-label">Site</span><span class="mb-val">https://yourorg.sharepoint.com/sites/RH</span></div>
+          <div class="mockup-row"><span class="mb-label">List name</span><span class="mb-val">TravelRequest</span></div>
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-num">Step 3 — Power Automate</div>
+        <div class="step-title">Send the notification to the administrative assistant</div>
+        <p style="color:var(--muted2);font-size:.9rem;margin-bottom:.75rem">Add <strong>« Send an email (V2) »</strong> with all the request details : </p>
+        <div class="mockup">
+          <div class="mockup-row"><span class="mb-label">To</span><span class="mb-val">adjointe@formation-demo.ca</span></div>
+          <div class="mockup-row"><span class="mb-label">Subject</span><span class="mb-val">New travel request — @{Requestor} → @{Destination}</span></div>
+          <div class="mockup-row"><span class="mb-label">Body</span><span class="mb-val">New request submitted by @{Requestor}.<br>Destination : @{Destination}<br>Start : @{StartDate}<br>Return : @{ReturnDate}<br>Subject : @{Objet}<br><br>Current Status : Pending processing.</span></div>
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-num">Step 4 — Power Automate</div>
+        <div class="step-title">Send the acknowledgment of receipt to the requester</div>
+        <p style="color:var(--muted2);font-size:.9rem;margin-bottom:.75rem">Add a second email to the requester to confirm that their request has been received:</p>
+        <div class="mockup">
+          <div class="mockup-row"><span class="mb-label">To</span><span class="mb-val">@{Requestor}</span><span class="mb-tag blue">dynamic</span></div>
+          <div class="mockup-row"><span class="mb-label">Subject</span><span class="mb-val">✅ Your travel request has been received</span></div>
+          <div class="mockup-row"><span class="mb-label">Body</span><span class="mb-val">Hello @{Requester}, your travel request to @{Destination} from @{DateDepart} to @{DateRetour} has been recorded and forwarded to your administrative assistant. You will receive a confirmation once the booking has been made.</span></div>
+        </div>
+        <div class="warn-box"><strong>🧪 Time to test!</strong> Submit an entry in the SharePoint list using your own email address as the requester. Verify that both the assistant and the requester receive their respective emails with the correct details.</div>
+      </div>
+
+      <h3>🎯 Benefits of automated processing</h3>
+      <p>A single workflow, four steps—and your travel process becomes traceable, standardized, and professional.</p>
+      <ul>
+        <li><strong>For employees:</strong> access their travel history and related documents (purchase orders and invoices) directly in SharePoint, at any time.</li>
+        <li><strong>For infrequent travelers:</strong> quickly complete a new request containing all required information, without needing administrative assistance.</li>
+        <li><strong>For administrative assistants:</strong> receive, process, and store travel details in one place—and foster mutual support within the administrative team.</li>
+      </ul>
       
     </div>
 
@@ -133,8 +189,8 @@
 </main>
 
 <footer style="text-align:center;padding:2rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:4rem">
-  <span class="footer-brand"><span data-i18n="brand_main">Automatisez vos tâches</span> <span data-i18n="brand_accent">répétitives</span></span>
-  <p style="margin:.5rem 0 0" data-i18n="footer_sub">Des tutoriels concrets pour aller plus loin avec Microsoft 365</p>
+  <span class="footer-brand"><span data-i18n="brand_main">Automate your tasks</span> <span data-i18n="brand_accent"></span></span>
+  <p style="margin:.5rem 0 0" data-i18n="footer_sub">Practical tutorials to get more out of Microsoft 365</p>
   <p style="margin:.25rem 0 0">© 2026 AutomatisezVousMême.ca</p>
 </footer>
 
