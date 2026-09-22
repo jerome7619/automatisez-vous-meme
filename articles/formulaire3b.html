@@ -132,13 +132,89 @@
     <!-- ARTICLE BODY EN -->
     <div id="article-body-en" class="article-body lang-en" style="display:none">
       <p>This daily flow monitors unanswered requests and acts automatically: reminder after 5 days, expiration after 10 days.</p>
-      <div class="step-block">
-        <div class="step-num">Steps 1–4</div>
-        <div class="step-title">Daily trigger → Get pending items → Condition A (5 days, RelanceCount=0) → Condition B (10 days, expire)</div>
-        <p style="color:var(--muted2);font-size:.9rem">The key expressions: <code>addDays(DateSoumission, 5) ≤ utcNow()</code> triggers the reminder. <code>RelanceCount = 0</code> ensures only one reminder is sent. <code>addDays(DateSoumission, 10) ≤ utcNow()</code> with status starting with "En attente" triggers expiration.</p>
+	  
+	   <div style="background:rgba(234,88,12,0.06);border-left:3px solid var(--orange);padding:.875rem 1rem;border-radius:0 8px 8px 0;font-size:.88rem;color:var(--muted2);margin:1.25rem 0">
+        <strong style="color:var(--text)">⏱ Estimated completion time :</strong> 30 to 40 minutes — Daily trigger, Sharepoint filter with two if clause.
       </div>
+	  
+	  
+	  
+<div class="step-block">
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Trigger : Every day at 10:00 AM</div>
+        <p style="color:var(--muted2);font-size:.9rem;margin-bottom:.75rem">Create a new flow using the <strong>Schedule (Recurrence) </strong>trigger :</p>
+        <div class="mockup">
+          <div class="mockup-row"><span class="mb-label">Intervall</span><span class="mb-val">1</span></div>
+          <div class="mockup-row"><span class="mb-label">Frequency</span><span class="mb-val">Day</span></div>
+          <div class="mockup-row"><span class="mb-label">Start time</span><span class="mb-val">2025-11-21T15:00:00Z</span><span class="mb-tag blue">= 10:00 AM</span></div>
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Retrieve pending requests from SharePoint</div>
+        <p style="color:var(--muted2);font-size:.9rem;margin-bottom:.75rem">Add <strong>« Get items »</strong> (SharePoint) to retrieve only requests that have not yet received a response:</p>
+        <div class="mockup">
+          <div class="mockup-row"><span class="mb-label">Liste</span><span class="mb-val">ListTrainingRequests</span></div>
+          <div class="mockup-row"><span class="mb-label">Filtre</span><span class="mb-val">Status eq 'Submitted' or Status eq 'Pending approval'</span></div>
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-num">Step 3</div>
+        <div class="step-title">Loop through each request and apply the reminder condition</div>
+        <p style="color:var(--muted2);font-size:.9rem;margin-bottom:.75rem">Add <strong>Apply to each</strong> loop on the results, followed by a  <strong>Condition</strong> to detect requests that have been awaiting a response for more than five days without a reminder:</p>
+        <div class="mockup">
+          <div class="mockup-row"><span class="mb-label">Condition A — Value 1</span><span class="mb-val">items('Apply_to_each')?['ReminderCount']</span><span class="mb-tag blue">dynamic</span></div>
+          <div class="mockup-row"><span class="mb-label">Operator</span><span class="mb-val">is equal to</span></div>
+          <div class="mockup-row"><span class="mb-label">Value 2</span><span class="mb-val">0</span></div>
+          <div class="mockup-row"><span class="mb-label">AND — Value 1</span><span class="mb-val">addDays(formatDateTime(items('Apply_to_each')?['SubmissionDate'],'yyyy-MM-ddTHH:mm:ss'),5)</span><span class="mb-tag blue">expression</span></div>
+          <div class="mockup-row"><span class="mb-label">Operator</span><span class="mb-val">less than or equal to</span></div>
+          <div class="mockup-row"><span class="mb-label">Value 2</span><span class="mb-val">utcNow()</span><span class="mb-tag blue">expression</span></div>
+        </div>
+        <div class="tip-box"><strong>💡 The addDays() function</strong> calculates a future or past date. <code>addDays(SubmissionDate, 5)</code> returns the submission date plus five days. If that date has already passed  (<code>≤ utcNow()</code>), the reminder is triggered. <code>ReminderCount = 0</code> ensures that the reminder is sent only once.</div>
+        <p style="color:var(--muted2);font-size:.88rem;margin:.875rem 0 .5rem"><strong>If yes — send a reminder to the manager:</strong></p>
+        <div class="mockup">
+          <div class="mockup-row"><span class="mb-label">To</span><span class="mb-val">@{items('Apply_to_each')?['Manager']}</span><span class="mb-tag blue">dynamic</span></div>
+          <div class="mockup-row"><span class="mb-label">Subject</span><span class="mb-val">Subject reminder : Approval request pending for 5 days</span></div>
+          <div class="mockup-row"><span class="mb-label">Corps</span><span class="mb-val">Hello, a request from @{Requester} for the training @{Training} submitted on @{SubmissionDate} requires your attention. Approval link : @{ApprovalLink}</span></div>
+        </div>
+        <p style="color:var(--muted2);font-size:.88rem;margin:.875rem 0 .5rem">After sending the reminder, update the request in SharePoint:</p>
+        <div class="mockup">
+          <div class="mockup-row"><span class="mb-label">Update</span><span class="mb-val">ReminderCount → 1 · Status → Pending Approval </span></div>
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-num">Step 4</div>
+        <div class="step-title">Expiration condition after 10 days</div>
+        <p style="color:var(--muted2);font-size:.9rem;margin-bottom:.75rem">In the <strong>« If no »</strong> branch of condition A, add a second condition to detect expired requests:</p>
+        <div class="mockup">
+          <div class="mockup-row"><span class="mb-label">Condition B — Value 1</span><span class="mb-val">items('Apply_to_each')?['Status']</span><span class="mb-tag blue">dynamic</span></div>
+          <div class="mockup-row"><span class="mb-label">Operator</span><span class="mb-val">starts with</span></div>
+          <div class="mockup-row"><span class="mb-label">Value 2</span><span class="mb-val">Pending</span></div>
+          <div class="mockup-row"><span class="mb-label">AND — Value 1</span><span class="mb-val">addDays(formatDateTime(items('Apply_to_each')?['SubmissionDate'],'yyyy-MM-ddTHH:mm:ss'),10)</span><span class="mb-tag blue">expression</span></div>
+          <div class="mockup-row"><span class="mb-label">Operator</span><span class="mb-val">less than or equal to</span></div>
+          <div class="mockup-row"><span class="mb-label">Value 2</span><span class="mb-val">utcNow()</span><span class="mb-tag blue">expression</span></div>
+        </div>
+        <p style="color:var(--muted2);font-size:.88rem;margin:.875rem 0 .5rem"><strong>If yes — expire the request and notify he employee : </strong></p>
+        <div class="mockup">
+          <div class="mockup-row"><span class="mb-label">Update</span><span class="mb-val">item Status → Expired</span></div>
+          <div class="mockup-row"><span class="mb-label">Email to employee</span><span class="mb-val">Subject: Your training request has expired · Body : Your request for @{Training} was not processed within the required timeframe. Please contact your manager.</span></div>
+        </div>
+      </div>
+
+      <h3>🎯 Result</h3>
+      <table class="excel-table">
+        <thead><tr><th>Delay</th><th>Automatic Action</th></tr></thead>
+        <tbody>
+          <tr><td>+ 5 days without a response</td><td>Email reminder sent to the manager  · ReminderCount → 1</td></tr>
+          <tr><td>+ 10 days without a response </td><td>Status → Expired · Employee notified </td></tr>
+        </tbody>
+      </table>
+
       
-      <div class="nav-series" style="margin-top:2rem"><a href="formulaire3a.html" class="nav-btn secondary">← Part 3 — Approval</a><a href="formulaire3c.html" class="nav-btn primary">Part 5 — Report →</a></div>
+      <div class="nav-series" style="margin-top:2rem"><a href="formulaire3a.html" class="nav-btn secondary">← Partie 3 — Approbation</a><a href="formulaire3c.html" class="nav-btn primary">Partie 5 — Rapport →</a></div>
     </div>
 
   </div>
