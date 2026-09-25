@@ -792,10 +792,7 @@ const voteTopics = [
 ];
 
 // Initialize vote counts
-let votes = {};
-voteTopics.forEach(t => { votes[t.id] = Math.floor(Math.random() * 30) + 8; });
-// Vacances et onboarding en tête
-votes['vacances'] += 20; votes['onboarding'] += 12;
+
 
 let userVote = null; // id of topic user voted for
 
@@ -821,7 +818,6 @@ function castVote(id) {
 function renderVoteGrid() {
   const t = i18n[currentLang];
   const grid = document.getElementById('vote-grid');
-  const sorted = getSorted();
 
   grid.innerHTML = sorted.map((topic, idx) => {
 
@@ -832,7 +828,7 @@ function renderVoteGrid() {
     const btnLabel = isVoted ? t.voted_btn : t.vote_btn;
 
     return `
-      <div class="vote-item ${isTop ? 'top-vote' : ''}" id="vitem-${topic.id}">
+      <div class="vote-item" id="vitem-${topic.id}">
         
         
         <div class="vote-text">
