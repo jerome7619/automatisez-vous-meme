@@ -441,7 +441,7 @@
     <div class="vote-section">
       <div class="vote-header">
         <div class="vote-title-block">
-          <h3 data-i18n="vote_title">🗳️ Quel processus souhaitez-vous automatiser?</h3>
+          <h3 data-i18n="vote_title">🗳️ Quel processus vous fait perdre le plus de temps?</h3>
           <p data-i18n="vote_sub">Votre vote influence directement les prochains tutoriels publiés. </p>
         </div>
     </div>
@@ -519,7 +519,7 @@ const i18n = {
     card5_desc: 'Copilot lit votre document et insère du contenu directement — sans copier-coller, sans licence payante.',
     card6_title: 'Publier un message Teams à un utilisateur via Power Automate',
     card6_desc: 'Guide pas à pas pour envoyer des messages personnalisés à des utilisateurs spécifiques dans Teams.',
-    vote_title: '🗳️ Quel processus souhaitez-vous automatiser?',
+    vote_title: '🗳️ Quel processus vous fait perdre le plus de temps?',
     vote_sub: 'Votre vote influence directement les prochains tutoriels publiés.',
     votes_cast: 'Votes exprimés',
     vote_btn: 'Voter',
@@ -652,7 +652,7 @@ const i18n = {
     card5_desc: 'Copilot reads your open document and inserts content directly — no copy-paste, no paid license.',
     card6_title: 'Post a Teams message to a user via Power Automate',
     card6_desc: 'Step-by-step guide to sending personalized messages to specific Teams users using an automated flow.',
-    vote_title: '🗳️ Which article would you like to read first?',
+    vote_title: '🗳️ Which process takes up the most of your time?',
     vote_sub: 'Your vote helps determine future tutorials.',
     votes_cast: 'Votes cast',
     vote_btn: 'Vote',
@@ -799,9 +799,6 @@ votes['vacances'] += 20; votes['onboarding'] += 12;
 
 let userVote = null; // id of topic user voted for
 
-function getTotalVotes() {
-  return Object.values(votes).reduce((a,b) => a+b, 0);
-}
 
 function getSorted() {
   return voteTopics;
@@ -811,22 +808,11 @@ function getSorted() {
 function castVote(id) {
   if (userVote !== null) return;
   userVote = id;
-  votes[id] += 1;
+
   renderVoteGrid();
   document.getElementById('voted-msg').style.display = 'block';
-  // Animate the bar
-  setTimeout(() => {
-    const total = getTotalVotes();
-    const sorted = getSorted();
-    sorted.forEach(topic => {
-      const el = document.getElementById('vitem-' + topic.id);
-      if (el) {
-        const bar = el.querySelector('.vote-bar-bg');
-        const pct = Math.round((votes[topic.id] / total) * 100);
-        if (bar) bar.style.width = pct + '%';
-      }
-    });
-  }, 50);
+
+
 }
 
 // ══════════════════════════════════
@@ -835,15 +821,10 @@ function castVote(id) {
 function renderVoteGrid() {
   const t = i18n[currentLang];
   const grid = document.getElementById('vote-grid');
-  const total = getTotalVotes();
   const sorted = getSorted();
-  document.getElementById('total-votes').textContent = total;
 
   grid.innerHTML = sorted.map((topic, idx) => {
-    const count = votes[topic.id];
-    const pct = Math.round((count / total) * 100);
-    const rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : 'rank-other';
-    const isTop = idx === 0;
+
     const isVoted = userVote === topic.id;
     const hasVoted = userVote !== null;
     const label = currentLang === 'fr' ? topic.fr : topic.en;
