@@ -846,6 +846,32 @@ async function saveVote(topic) {
  
 	console.log(result);
 }	
+async function castVote(id) {
+
+    if (localStorage.getItem("vote")) {
+        return;
+    }
+
+    try {
+
+        await saveVote(id);
+
+        localStorage.setItem("vote", id);
+
+        userVote = id;
+
+        votes = await loadVotes();
+
+        renderVoteGrid();
+
+        document.getElementById("voted-msg").style.display = "block";
+
+    } catch(error){
+
+        console.error(error);
+
+    }
+}	
 
 let votes = {};
 document.addEventListener('DOMContentLoaded', async () => {
