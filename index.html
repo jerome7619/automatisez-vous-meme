@@ -867,6 +867,12 @@ async function saveVote(topic) {
             body: JSON.stringify(votes)
         }
     );
+
+	console.log("Status:", response.status);
+ 
+	const result = await response.json();
+ 
+	console.log(result);
 }	
 
 let votes = {};
