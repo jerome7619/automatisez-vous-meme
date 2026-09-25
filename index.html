@@ -813,7 +813,7 @@ function castVote(id) {
 function renderVoteGrid() {
   const t = i18n[currentLang];
   const grid = document.getElementById('vote-grid');
-
+  const sorted = voteTopics;
 grid.innerHTML = voteTopics.map((topic) => {
 
     const isVoted = userVote === topic.id;
