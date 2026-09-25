@@ -456,16 +456,7 @@
       </div>
     </div>
   </section>
-function resetVote() {
 
-    localStorage.removeItem("vote");
-
-    userVote = null;
-
-    document.getElementById("voted-msg").style.display = "none";
-
-    renderVoteGrid();
-}
 	<!-- Bouton de débogage pour tester le vote -->	
 <button onclick="resetVote()">
 Réinitialiser mon vote
@@ -887,7 +878,16 @@ async function castVote(id) {
 
     }
 }	
+function resetVote() {
 
+    localStorage.removeItem("vote");
+
+    userVote = null;
+
+    document.getElementById("voted-msg").style.display = "none";
+
+    renderVoteGrid();
+}
 let votes = {};
 document.addEventListener('DOMContentLoaded', async () => {
 
