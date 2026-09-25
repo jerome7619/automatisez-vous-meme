@@ -819,34 +819,6 @@ async function loadVotes() {
 
     return data.record;
 }
-async function castVote(id) {
-
-    if (localStorage.getItem("vote")) {
-        return;
-    }
-
-    try {
-
-        await saveVote(id);
-
-        localStorage.setItem("vote", id);
-
-        userVote = id;
-
-        votes = await loadVotes();
-
-        renderVoteGrid();
-
-        document.getElementById("voted-msg").style.display = "block";
-
-    }
-    catch(error){
-
-        console.error(error);
-
-    }
-}
-	
 // ══════════════════════════════════
 // Fonction de vote jsonbin.io
 // ══════════════════════════════════
@@ -856,7 +828,7 @@ async function saveVote(topic) {
 
     votes[topic]++;
 
-    await fetch(
+    const response = await fetch(
         `https://api.jsonbin.io/v3/b/${BIN_ID}`,
         {
             method: "PUT",
