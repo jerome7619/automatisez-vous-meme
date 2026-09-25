@@ -829,6 +829,27 @@ async function loadVotes() {
     return data.record;
 }
 // ══════════════════════════════════
+// Fonction de vote jsonbin.io
+// ══════════════════════════════════
+async function saveVote(topic) {
+
+    const votes = await loadVotes();
+
+    votes[topic]++;
+
+    await fetch(
+        `https://api.jsonbin.io/v3/b/${BIN_ID}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Master-Key": API_KEY
+            },
+            body: JSON.stringify(votes)
+        }
+    );
+}	
+// ══════════════════════════════════
 // ARTICLES MODAL
 // ══════════════════════════════════
 function renderVoteGrid() {
