@@ -798,7 +798,8 @@ let userVote = null; // id of topic user voted for
 
 
 function castVote(id) {
-  if (userVote !== null) return;
+  if (localStorage.getItem('vote')) return;
+  localStorage.setItem('vote', id);
   userVote = id;
 
   renderVoteGrid();
@@ -841,6 +842,7 @@ grid.innerHTML = voteTopics.map((topic) => {
 
 // Init
 document.addEventListener('DOMContentLoaded', function() {
+  userVote = localStorage.getItem('vote');
   setLang('fr');
   renderVoteGrid();
 });
