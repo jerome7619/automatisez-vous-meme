@@ -797,11 +797,6 @@ const voteTopics = [
 let userVote = null; // id of topic user voted for
 
 
-function getSorted() {
-  return voteTopics;
-}
-
-
 function castVote(id) {
   if (userVote !== null) return;
   userVote = id;
@@ -819,7 +814,7 @@ function renderVoteGrid() {
   const t = i18n[currentLang];
   const grid = document.getElementById('vote-grid');
 
-  grid.innerHTML = sorted.map((topic, idx) => {
+grid.innerHTML = voteTopics.map((topic) => {
 
     const isVoted = userVote === topic.id;
     const hasVoted = userVote !== null;
