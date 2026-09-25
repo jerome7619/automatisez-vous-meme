@@ -921,7 +921,7 @@ function renderVoteGrid() {
   const grid = document.getElementById('vote-grid');
   const sorted = voteTopics;
 grid.innerHTML = voteTopics.map((topic) => {
-//	const count = votes[topic.id] || 0;
+	const count = votes[topic.id] || 0;
     const isVoted = userVote === topic.id;
     const hasVoted = userVote !== null;
     const label = currentLang === 'fr' ? topic.fr : topic.en;
@@ -935,7 +935,7 @@ grid.innerHTML = voteTopics.map((topic) => {
         <div class="vote-text">
           <h4>${label}</h4>
           <p>${desc}</p>
-	<!--	  <small>${count} votes</small> -->
+
         </div>
 
         <button class="vote-btn ${isVoted ? 'voted' : ''}" 
