@@ -797,16 +797,7 @@ const voteTopics = [
 let userVote = null; // id of topic user voted for
 
 
-function castVote(id) {
-  if (localStorage.getItem('vote')) return;
-  localStorage.setItem('vote', id);
-  userVote = id;
 
-  renderVoteGrid();
-  document.getElementById('voted-msg').style.display = 'block';
-
-
-}
 // ══════════════════════════════════
 // Compteur de vote jsonbin.io
 // ══════════════════════════════════	
@@ -828,6 +819,34 @@ async function loadVotes() {
 
     return data.record;
 }
+async function castVote(id) {
+
+    if (localStorage.getItem("vote")) {
+        return;
+    }
+
+    try {
+
+        await saveVote(id);
+
+        localStorage.setItem("vote", id);
+
+        userVote = id;
+
+        votes = await loadVotes();
+
+        renderVoteGrid();
+
+        document.getElementById("voted-msg").style.display = "block";
+
+    }
+    catch(error){
+
+        console.error(error);
+
+    }
+}
+	
 // ══════════════════════════════════
 // Fonction de vote jsonbin.io
 // ══════════════════════════════════
@@ -849,6 +868,30 @@ async function saveVote(topic) {
         }
     );
 }	
+
+let votes = {};
+document.addEventListener('DOMContentLoaded', async () => {
+
+    try {
+
+        votes = await loadVotes();
+
+    } catch(ex) {
+
+        console.error(ex);
+
+    }
+
+    userVote = localStorage.getItem("vote");
+
+    setLang('fr');
+
+    renderVoteGrid();
+
+});
+	
+
+	
 // ══════════════════════════════════
 // ARTICLES MODAL
 // ══════════════════════════════════
@@ -857,7 +900,7 @@ function renderVoteGrid() {
   const grid = document.getElementById('vote-grid');
   const sorted = voteTopics;
 grid.innerHTML = voteTopics.map((topic) => {
-
+	const count = votes[topic.id] || 0;
     const isVoted = userVote === topic.id;
     const hasVoted = userVote !== null;
     const label = currentLang === 'fr' ? topic.fr : topic.en;
@@ -871,6 +914,7 @@ grid.innerHTML = voteTopics.map((topic) => {
         <div class="vote-text">
           <h4>${label}</h4>
           <p>${desc}</p>
+		  <small>${count} votes</small>
         </div>
 
         <button class="vote-btn ${isVoted ? 'voted' : ''}" 
@@ -881,12 +925,7 @@ grid.innerHTML = voteTopics.map((topic) => {
   }).join('');
 }
 
-// Init
-document.addEventListener('DOMContentLoaded', function() {
-  userVote = localStorage.getItem('vote');
-  setLang('fr');
-  renderVoteGrid();
-});
+
 </script>
 <script>
   window.REQUIRED_CODE_ERROR_MESSAGE = 'Please choose a country code';
